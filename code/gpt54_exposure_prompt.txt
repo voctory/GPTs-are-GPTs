@@ -1,0 +1,82 @@
+You are labeling O*NET worker tasks for AI exposure, updating Eloundou et al. (2023) for early-2026 capabilities.
+
+Definition of exposure:
+A task is exposed if AI can reduce the time required for an average worker to complete the task by at least 50% at equivalent quality.
+Equivalent quality means the recipient of the output would not notice or care that AI assistance was used.
+
+Assume the baseline system is GPT-5.4 used in a standard chat/API workflow.
+
+For E1, assume the model has these direct/native capabilities:
+- strong text and code generation
+- long-context reasoning over long documents and multiple files
+- image, screenshot, PDF, and document understanding
+- structured outputs and reliable extraction/transformation
+
+For E1, do NOT assume:
+- live web browsing
+- access to private organizational data
+- clicking through websites or software UIs
+- external actions in third-party systems
+- physical embodiment or specialized hardware
+
+Labels:
+
+E0 = Not exposed
+Use E0 if GPT-5.4 would not reduce the time required by at least 50% at equivalent quality, even with normal digital assistance.
+Also use E0 when the core of the task is physical manipulation, in-person interaction, relationship management, tacit situational judgment, or accountable final human judgment that AI may inform but does not substantially accelerate.
+
+E1 = Directly exposed
+Use E1 if GPT-5.4 alone, used directly without external actions or bespoke integration, can reduce the time required by at least 50% at equivalent quality.
+Tasks involving long documents, PDFs, screenshots, tables, or multiple files can still be E1 if direct file/image reasoning is enough.
+
+E2 = Exposed with tools / agentic workflow
+Use E2 if E1 does not hold, but the task would likely cross the 50% threshold when GPT-5.4 is paired with common digital tools or light-to-moderate workflow automation, such as:
+- public web retrieval or browsing
+- enterprise/file search or retrieval over private documents/data
+- code execution, spreadsheets, or document manipulation
+- database/query tools
+- function/API calls into normal business software
+- browser/UI automation or multi-step agentic workflows across software systems
+
+Guidance:
+- Do NOT push a task to E2 merely because it involves long documents, PDFs, images, forms, or tables; these often belong in E1 now.
+- Need for up-to-date public facts usually implies E2, not E0.
+- Need for private organizational search usually implies E2, not E0.
+- Need to navigate websites or software systems usually implies E2.
+- If AI can do most of the cognitive work and the remaining human step is light, lean toward exposure.
+- If the remaining human step is the core of the task, lean away from exposure.
+
+Input rows will be provided as JSON with these fields:
+- row_id
+- onet_soc_code
+- task_id
+- title
+- task_type
+- task
+
+Treat the following row template as the substantive task description:
+Occupation title: {Title}
+Task type: {Task Type}
+Task: {Task}
+
+Requirements:
+- Classify every input row exactly once.
+- Preserve row_id, onet_soc_code, and task_id exactly as given.
+- Use only the provided task description and general early-2026 capabilities assumptions above.
+- Do not invent fields.
+- Do not omit uncertain rows; use low confidence instead.
+- Keep each reason concise and task-specific, no more than 80 words.
+
+Return strict JSON only with this exact shape:
+{
+  "results": [
+    {
+      "row_id": "<copy from input>",
+      "onet_soc_code": "<copy from input>",
+      "task_id": "<copy from input>",
+      "label": "E0" | "E1" | "E2",
+      "reason": "<=80 words",
+      "confidence": "low" | "medium" | "high"
+    }
+  ]
+}
