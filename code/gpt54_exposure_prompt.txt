@@ -4,47 +4,53 @@ Definition of exposure:
 A task is exposed if AI can reduce the time required for an average worker to complete the task by at least 50% at equivalent quality.
 Equivalent quality means the recipient of the output would not notice or care that AI assistance was used.
 
-Assume the baseline system is GPT-5.4 used in a standard chat/API workflow.
+Assume the baseline system is GPT-5.4 operated in a supervised agentic workflow, such as Codex CLI or a comparable API setup with standard business tools enabled when needed.
 
-For E1, assume the model has these direct/native capabilities:
+For E1, assume the model has these direct/native capabilities without external tool calls:
 - strong text and code generation
 - long-context reasoning over long documents and multiple files
 - image, screenshot, PDF, and document understanding
 - structured outputs and reliable extraction/transformation
 
-For E1, do NOT assume:
-- live web browsing
-- access to private organizational data
-- clicking through websites or software UIs
-- external actions in third-party systems
-- physical embodiment or specialized hardware
+For E2, assume the agent can additionally use common digital tools under human supervision, including:
+- public web search and web fetch
+- private file or enterprise search over authorized documents and data
+- spreadsheets, document editing, and code execution
+- shell commands, database queries, and file manipulation
+- function or API calls into ordinary business software
+- browser or UI automation across websites and software systems
+
+Do NOT assume:
+- perfect autonomy or perfect reliability
+- unsupervised execution in high-stakes environments
+- free access to every private system or credential
+- physical embodiment or in-person presence
+- replacing live relationship-building, persuasion, or executive authority
 
 Labels:
 
 E0 = Not exposed
-Use E0 if GPT-5.4 would not reduce the time required by at least 50% at equivalent quality, even with normal digital assistance.
-Also use E0 when the core of the task is physical manipulation, in-person interaction, relationship management, tacit situational judgment, or accountable final human judgment that AI may inform but does not substantially accelerate.
+Use E0 if GPT-5.4 would probably not reduce the time required by at least 50% at equivalent quality, even with supervised agentic tool use.
+Do NOT use E0 merely because a human remains accountable, must review the output, or gives final sign-off.
+Use E0 when the core of the task is physical manipulation, in-person interaction, live relationship management, politically sensitive stakeholder alignment, high-stakes persuasion, or irreversible accountable judgment where the human act itself is the job.
 
 E1 = Directly exposed
-Use E1 if GPT-5.4 alone, used directly without external actions or bespoke integration, can reduce the time required by at least 50% at equivalent quality.
-Tasks involving long documents, PDFs, screenshots, tables, or multiple files can still be E1 if direct file/image reasoning is enough.
+Use E1 if GPT-5.4 alone, used directly without external actions or tool calls, can reduce the time required by at least 50% at equivalent quality.
+Tasks involving long documents, PDFs, screenshots, tables, or multiple files can still be E1 if direct file or image reasoning is enough.
 
 E2 = Exposed with tools / agentic workflow
-Use E2 if E1 does not hold, but the task would likely cross the 50% threshold when GPT-5.4 is paired with common digital tools or light-to-moderate workflow automation, such as:
-- public web retrieval or browsing
-- enterprise/file search or retrieval over private documents/data
-- code execution, spreadsheets, or document manipulation
-- database/query tools
-- function/API calls into normal business software
-- browser/UI automation or multi-step agentic workflows across software systems
+Use E2 if E1 does not hold, but a supervised agentic workflow would likely cross the 50% threshold.
+Choose E2 when AI can do most of the substantive research, drafting, retrieval, analysis, document manipulation, spreadsheet work, system navigation, or follow-up steps, even if a human still approves, negotiates edge cases, or owns the final decision.
 
 Guidance:
-- Do NOT push a task to E2 merely because it involves long documents, PDFs, images, forms, or tables; these often belong in E1 now.
+- Do NOT push a task to E2 merely because it involves long documents, PDFs, images, forms, or tables; many of these belong in E1 now.
 - Need for up-to-date public facts usually implies E2, not E0.
 - Need for private organizational search usually implies E2, not E0.
 - Need to navigate websites or software systems usually implies E2.
-- If AI can do most of the cognitive work and the remaining human step is light, lean toward exposure.
-- If the remaining human step is the core of the task, lean away from exposure.
+- Do NOT downgrade to E0 only because the task affects money, staffing, policy, contracts, or compliance. Ask whether AI can still do most of the underlying cognitive and administrative work.
+- If AI can do most of the work and the remaining human role is mainly review, approval, exception handling, or a short live interaction, lean E2.
+- If live negotiation, coalition building, people management, or in-person situational judgment is the core of the task, lean E0.
+- When in doubt, evaluate time saved for an average worker using a realistic supervised agentic setup, not full autonomy and not bare chat alone.
 
 Input rows will be provided as JSON with these fields:
 - row_id

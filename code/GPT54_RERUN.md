@@ -5,7 +5,10 @@ This repo does not include the original GPT-4 labeling workflow. It only include
 ## What This Adds
 
 - `code/gpt54_exposure_prompt.txt`
-  - The early-2026 GPT-5.4 exposure rubric and output contract.
+  - The default early-2026 GPT-5.4 exposure rubric and output contract.
+  - The default rubric assumes a supervised agentic workflow, not bare chat alone.
+- `code/gpt54_exposure_prompt_conservative_v1.txt`
+  - The earlier, stricter rubric preserved for comparison runs.
 - `code/gpt54_exposure_schema.json`
   - The strict JSON schema used with `codex exec --output-schema`.
 - `code/gpt54_rerun.py`
@@ -40,6 +43,16 @@ The merged TSV preserves the legacy `full_labelset.tsv` columns when available a
 - `gpt54_alpha`
 - `gpt54_beta`
 - `gpt54_gamma`
+
+By default, the rerun now uses the agentic rubric version
+`gpt54_early2026_agentic_rubric_v2`. If you want to run the archived
+conservative rubric instead, pass both:
+
+```bash
+python3 code/gpt54_rerun.py classify-all \
+  --prompt-template-path code/gpt54_exposure_prompt_conservative_v1.txt \
+  --prompt-version gpt54_early2026_conservative_rubric_v1
+```
 
 ## Recommended Commands
 

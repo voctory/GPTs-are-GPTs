@@ -36,7 +36,7 @@ DEFAULT_TASK_DELTA_PATH = REPO_ROOT / "data" / "gpt54_vs_gpt4_task_delta.tsv"
 DEFAULT_OCC_DELTA_PATH = REPO_ROOT / "data" / "gpt54_vs_gpt4_occ_delta.tsv"
 DEFAULT_SUMMARY_PATH = REPO_ROOT / "data" / "gpt54_vs_gpt4_summary.json"
 
-PROMPT_VERSION = "gpt54_early2026_rubric_v1"
+DEFAULT_PROMPT_VERSION = "gpt54_early2026_agentic_rubric_v2"
 DEFAULT_MODEL = "gpt-5.4"
 DEFAULT_REASONING_EFFORT = "medium"
 DEFAULT_SHARD_SIZE = 100
@@ -137,6 +137,7 @@ def create_batches(
     start_index: int,
     limit: int | None,
     row_id_filter: set[str] | None,
+    prompt_version: str,
 ) -> None:
     rows = read_tsv_rows(input_path)
     selected_rows = rows[start_index:]
@@ -161,7 +162,7 @@ def create_batches(
         payload = {
             "batch_id": batch_id,
             "created_at_utc": datetime.now(timezone.utc).isoformat(),
-            "prompt_version": PROMPT_VERSION,
+            "prompt_version": prompt_version,
             "source_path": str(input_path),
             "rows": make_batch_payload(batch_rows),
         }
@@ -172,7 +173,7 @@ def create_batches(
     manifest = {
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "input_path": str(input_path),
-        "prompt_version": PROMPT_VERSION,
+        "prompt_version": prompt_version,
         "total_source_rows": len(rows),
         "selected_rows": len(selected_rows),
         "shard_size": shard_size,
@@ -314,6 +315,7 @@ def classify_batch(
     work_dir: Path,
     model: str,
     reasoning_effort: str,
+    prompt_version: str,
     force: bool,
 ) -> None:
     payload = load_batch(batch_path)
@@ -355,7 +357,7 @@ def classify_batch(
         "batch_id": batch_id,
         "model": model,
         "reasoning_effort": reasoning_effort,
-        "prompt_version": PROMPT_VERSION,
+        "prompt_version": prompt_version,
         "source_batch_path": str(batch_path),
         "results": normalized_results,
     }
@@ -375,6 +377,7 @@ def classify_all(
     schema_path: Path,
     model: str,
     reasoning_effort: str,
+    prompt_version: str,
     force: bool,
     max_batches: int | None,
 ) -> None:
@@ -394,6 +397,7 @@ def classify_all(
             work_dir=work_dir,
             model=model,
             reasoning_effort=reasoning_effort,
+            prompt_version=prompt_version,
             force=force,
         )
 
@@ -773,6 +777,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional newline-delimited list of row_id values to include.",
     )
+    make_batches_parser.add_argument(
+        "--prompt-version",
+        default=DEFAULT_PROMPT_VERSION,
+        help="Prompt version label written into the batch manifest.",
+    )
 
     classify_batch_parser = subparsers.add_parser(
         "classify-batch",
@@ -802,6 +811,10 @@ def build_parser() -> argparse.ArgumentParser:
     classify_batch_parser.add_argument(
         "--reasoning-effort",
         default=DEFAULT_REASONING_EFFORT,
+    )
+    classify_batch_parser.add_argument(
+        "--prompt-version",
+        default=DEFAULT_PROMPT_VERSION,
     )
     classify_batch_parser.add_argument(
         "--force",
@@ -835,6 +848,10 @@ def build_parser() -> argparse.ArgumentParser:
     classify_all_parser.add_argument(
         "--reasoning-effort",
         default=DEFAULT_REASONING_EFFORT,
+    )
+    classify_all_parser.add_argument(
+        "--prompt-version",
+        default=DEFAULT_PROMPT_VERSION,
     )
     classify_all_parser.add_argument(
         "--force",
@@ -944,6 +961,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 start_index=args.start_index,
                 limit=args.limit,
                 row_id_filter=row_id_filter,
+                prompt_version=args.prompt_version,
             )
         elif args.command == "classify-batch":
             classify_batch(
@@ -953,6 +971,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 work_dir=args.work_dir,
                 model=args.model,
                 reasoning_effort=args.reasoning_effort,
+                prompt_version=args.prompt_version,
                 force=args.force,
             )
         elif args.command == "classify-all":
@@ -962,6 +981,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 schema_path=args.schema_path,
                 model=args.model,
                 reasoning_effort=args.reasoning_effort,
+                prompt_version=args.prompt_version,
                 force=args.force,
                 max_batches=args.max_batches,
             )
